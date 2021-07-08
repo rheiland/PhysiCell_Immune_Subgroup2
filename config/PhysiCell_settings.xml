@@ -730,7 +730,7 @@
 			<number_of_neutrophils type="int" units="none" 
 				description="initial number of neutrophils">0</number_of_neutrophils>
 			<number_of_DCs type="int" units="cells" 
-				description="DC0: initial number of Dendritic Cells">1798</number_of_DCs> <!-- 640-->
+				description="DC0: initial number of Dendritic Cells">100</number_of_DCs> <!-- 1798-->
 			<number_of_CD4_Tcells type="int" units="none" 
 				description="initial number of CD4 Tcells in tissue">0</number_of_CD4_Tcells> 
 			<perecentage_tissue_vascularized type="double" units="percentage" 
@@ -773,23 +773,23 @@
 				
 			<!-- immune recruitment rates -->			
 			<CD8_max_recruitment_rate type="double" units="cells/min/micron^3"
-				description="rCD8recruit: max CD8 recruitment rate (for saturated signal)">4e-9</CD8_max_recruitment_rate> <!-- 4e-9 debug -->
+				description="rCD8recruit: max CD8 recruitment rate (for saturated signal)">6e-9</CD8_max_recruitment_rate> <!-- 4e-9 debug -->
 			<CD8_recruitment_min_signal type="double" units="substrate/micron^3"
 				description="RminCD8: min concentration to attract CD8">0.15</CD8_recruitment_min_signal> <!--0.1 debug -->
 			<CD8_recruitment_saturation_signal type="double" units="substrate/micron^3"
 				description="RsatCD8: saturating concentration to attract CD8">0.4</CD8_recruitment_saturation_signal> <!-- 0.3 debug -->
 			<macrophage_max_recruitment_rate type="double" units="cells/min/micron^3"
-				description="rMrecruit: max macrophage recruitment rate (for saturated signal)">4e-9</macrophage_max_recruitment_rate> <!-- 4e-9 debug -->
+				description="rMrecruit: max macrophage recruitment rate (for saturated signal)">1e-9</macrophage_max_recruitment_rate> <!-- 4e-9 debug -->
 			<macrophage_recruitment_min_signal type="double" units="substrate/micron^3"
-				description="RminM: min concentration to attract macrophages">0.05</macrophage_recruitment_min_signal> <!--0.1 debug -->
+				description="RminM: min concentration to attract macrophages">0.1</macrophage_recruitment_min_signal> <!--0.1 debug -->
 			<macrophage_recruitment_saturation_signal type="double" units="substrate/micron^3"
-				description="RsatM: saturating concentration to attract macrophages">0.2</macrophage_recruitment_saturation_signal> <!-- 0.3 debug -->
+				description="RsatM: saturating concentration to attract macrophages">0.5</macrophage_recruitment_saturation_signal> <!-- 0.3 debug -->
 			<neutrophil_max_recruitment_rate type="double" units="cells/min/micron^3"
 				description="rNrecuit: max neutrophil recruitment rate (for saturated signal)">1e-9</neutrophil_max_recruitment_rate> <!-- 4e-9 debug -->
 			<neutrophil_recruitment_min_signal type="double" units="substrate/micron^3"
 				description="RminN: min concentration to attract neutrophils">0.05</neutrophil_recruitment_min_signal> <!--0.1 debug -->
 			<neutrophil_recruitment_saturation_signal type="double" units="substrate/micron^3"
-				description="RsatN: saturating concentration to attract neutrophils">0.1</neutrophil_recruitment_saturation_signal> <!-- 0.3 debug -->
+				description="RsatN: saturating concentration to attract neutrophils">0.5</neutrophil_recruitment_saturation_signal> <!-- 0.3 debug -->
 					
 			<!-- virus parameters --> 
 			<virus_fraction_released_at_death type="double" units="none" 
@@ -835,7 +835,7 @@
 			<IC_50_IFN type="double" units="cells" 
 				description="IFN half effect on viral efficacy">60</IC_50_IFN><!-- 30 -->
 			<IFN_secretion_rate type="double" units="cells" 
-				description="IFN secretion rate from infected cells">0.01</IFN_secretion_rate> <!-- -->
+				description="IFN secretion rate from infected cells">0.1</IFN_secretion_rate> <!-- -->
 			<epithelial_cell_proliferation_rate type="double" units="none"
 				description="Rate that epithelial cells proliferate">5.167e-4</epithelial_cell_proliferation_rate>
 			<infected_cell_death_rate type="double" units="1/min"

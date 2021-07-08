@@ -22,6 +22,9 @@ void epithelium_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static int proinflammatory_cytokine_index = microenvironment.find_density_index( "pro-inflammatory cytokine");
 	static int vtest_external = microenvironment.find_density_index( "VTEST" ); 
 		
+		
+	static int apoptosis_index = pCell->phenotype.death.find_death_model_index( "apoptosis" ); 
+	
 	// viral dynamics model 
 	internal_viral_dynamics_info.phenotype_function(pCell,phenotype,dt); 
 	// internal_virus_model(pCell,phenotype,dt);
@@ -37,7 +40,6 @@ void epithelium_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	ROS_induced_apoptosis(pCell, phenotype, dt);
 			
 	// if I am dead, remove all adhesions 
-	static int apoptosis_index = phenotype.death.find_death_model_index( "apoptosis" ); 
 	if( phenotype.death.dead == true )
 	{
 		// detach all attached cells 
@@ -199,6 +201,7 @@ void TCell_induced_apoptosis( Cell* pCell, Phenotype& phenotype, double dt )
 	static int proinflammatory_cytokine_index = microenvironment.find_density_index("pro-inflammatory cytokine");
 	static int virion_index = microenvironment.find_density_index("virion");
 	static int vtest_index = microenvironment.find_density_index("VTEST");
+	
 	
 	
 	if( pCell->custom_data["TCell_contact_time"] > pCell->custom_data["TCell_contact_death_threshold"] )

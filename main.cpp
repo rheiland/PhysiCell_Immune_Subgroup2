@@ -86,11 +86,6 @@ using namespace PhysiCell;
 std::string COVID19_version = "0.4.0"; 
 
 double DM = 0; // global ICs
-double TC = 10;
-double TH1 = 1;
-double TH2 = 1;
-double TCt = 0;
-double Tht = 0;
 
 int main( int argc, char* argv[] )
 {
@@ -197,7 +192,7 @@ int main( int argc, char* argv[] )
 				{	
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
-					dm_tc_file << DM << " " << TC << " " << TH1 << " " << TH2 << " " << TCt << " " << Tht << std::endl; //write globals data
+					dm_tc_file << DM << std::endl; //write globals data
 					
 					save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 				}
@@ -224,6 +219,9 @@ int main( int argc, char* argv[] )
 			
 			//external_immune_main_model( diffusion_dt );
 			//external_immune_model( diffusion_dt );
+			
+			//external_immune_main_model( diffusion_dt );
+			//lymph_node_DCs_model( diffusion_dt );
 			
 			// receptor dynamics 			
 			simple_receptor_dynamics_main_model( diffusion_dt );

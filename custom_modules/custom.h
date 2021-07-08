@@ -71,7 +71,7 @@
 #include "./submodel_data_structures.h" 
 #include "./internal_viral_dynamics.h"
 #include "./internal_viral_response.h" 
-#include "./external_immune.h"
+#include "./lymph_node_DCs.h"
 #include "./receptor_dynamics.h" 
 #include "./immune_submodels.h" 
 #include "./epithelium_submodel.h" 
