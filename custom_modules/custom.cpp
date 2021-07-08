@@ -184,7 +184,7 @@ void setup_tissue( void )
 	
 	int large_bron = parameters.ints("large_bron");
 	int small_bron = parameters.ints("small_bron");
-	int density_virions = parameters.ints("density_virion");
+	double density_virions = parameters.doubles("density_virion");
 	
 	int bronchcentre1_x = 1500-4000;
 	int bronchcentre1_y = 2500-2500;	

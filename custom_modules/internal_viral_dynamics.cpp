@@ -51,6 +51,7 @@ void simple_intracellular_replication_model(  Cell* pCell, Phenotype& phenotype,
 
 	static int vtest_external = microenvironment.find_density_index( "VTEST" ); 
 	static int proinflammatory_cytokine_index = microenvironment.find_density_index( "pro-inflammatory cytokine");
+	static int apoptosis_index = pCell->phenotype.death.find_death_model_index( "apoptosis" ); 
 	
 	double Vconc = pCell->phenotype.molecular.internalized_total_substrates[vtest_external];
 	double Vvoxel = microenvironment.mesh.voxels[1].volume;
@@ -65,6 +66,8 @@ void simple_intracellular_replication_model(  Cell* pCell, Phenotype& phenotype,
 		pCell->phenotype.molecular.internalized_total_substrates[vtest_external] += gamnuc*Vconc*(1-Vconc/alpha)*dt;
 		if(pCell->custom_data["eclipse_time"]<1)
 		{pCell->custom_data["eclipse_time"] = PhysiCell_globals.current_time+tau_rel;}
+		pCell->phenotype.death.rates[apoptosis_index] = parameters.doubles("infected_cell_death_rate");
+	
 	}
 	else if(pCell->custom_data["antiviral_state"]>0.5) //Cell is in an antiviral state stop secreting cytokine and virions
 	{

@@ -627,9 +627,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	 
 	//(adrianne) adding virus uptake by phagocytes
 	static int virus_index = microenvironment.find_density_index("virion");
-	
-	static int vtest_external = microenvironment.find_density_index( "VTEST" ); 
-			
+	static int vtest_external = microenvironment.find_density_index( "VTEST" ); 			
 	
 	pCell->phenotype.secretion.uptake_rates[vtest_external] = parameters.doubles("phagocytes_virus_uptake_rate");		
 			
@@ -993,13 +991,14 @@ void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	//std::cout<<"DC phenotype"<<std::endl;
 	// (Adrianne) get type of CD8+ T cell
 	static int CD8_Tcell_type = get_cell_definition( "CD8 Tcell" ).type;
+	static int apoptosis_index = phenotype.death.find_death_model_index( "apoptosis" ); 
 	
 	// (Adrianne) if DC is already activated, then check whether it leaves the tissue
-	if( pCell->custom_data["activated_immune_cell"] >  0.5 && UniformRandom() < 0.002)
+	if( pCell->custom_data["activated_immune_cell"] >  0.5 && UniformRandom() < parameters.doubles("prob_DC_leaves"))
 	{
 		extern double DM; //declare existance of DC lymph
 		// (Adrianne) DC leaves the tissue and so we lyse that DC
-		//std::cout<<"DC leaves tissue"<<std::endl;
+		std::cout<<"DC leaves tissue"<<std::endl;
 		
 		// adding a flag to say, "I'm a DC and I left the tissue, I didn't die, so don't eat me!"
 		pCell->custom_data["DC_leaving_not_dying"]=1.0;

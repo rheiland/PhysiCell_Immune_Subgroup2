@@ -741,8 +741,8 @@
 				description="Virus release rate">120</large_bron>
 			<small_bron type="int" units="microns"
 				description="Virus release rate">60</small_bron>
-			<density_virion type="int" units="virions"
-				description="Virus release rate">0.1</density_virion>
+			<density_virion type="double" units="virions"
+				description="Virus release rate">0.00128</density_virion>
 			
 			<!-- cell colouring --> 
 			<color_variable type="string" description="color cells based on this variable">Vnuc</color_variable>
@@ -827,7 +827,9 @@
 			<Infection_detection_threshold type="double" units="none"
 				description="Amount of intracellular virus for phagocyte detection">10</Infection_detection_threshold>	
 			<Death_rates_of_old_Tcells type="double" units="none"
-				description="Death rate of old T cells">100</Death_rates_of_old_Tcells>						
+				description="Death rate of old T cells">100</Death_rates_of_old_Tcells>	
+			<prob_DC_leaves type="double" units="dimensionless"
+				description="Probability DC leaves tissue">0.002</prob_DC_leaves>
 
 			<!-- epithelial cell parameters -->			
 			<IC_50_IFN type="double" units="cells" 
@@ -836,6 +838,8 @@
 				description="IFN secretion rate from infected cells">0.01</IFN_secretion_rate> <!-- -->
 			<epithelial_cell_proliferation_rate type="double" units="none"
 				description="Rate that epithelial cells proliferate">5.167e-4</epithelial_cell_proliferation_rate>
+			<infected_cell_death_rate type="double" units="1/min"
+				description="Infected cell death rate">5.31667e-05</infected_cell_death_rate>
 							
 			<!-- cell virus binding parameters -->			
 			<kAtthi type="double" units="1/site/min"
@@ -881,7 +885,7 @@
 				
 			<!-- antiviral state parameters -->
 			<tau_IFN type="double" units="virions/min"
-				description="Virus release rate">14400</tau_IFN>
+				description="Virus release rate">21600</tau_IFN><!-- 14400-->
 				
 							
 	</user_parameters>
