@@ -1,0 +1,78 @@
+# File to be used with params_run.py
+# This file runs sequential changes in recruitment rate parameters for macrophages/neutrophils and T cells
+# Allows for changing parameters in .xml, running sim, and writing results to different folders.
+# <key> <value> pairs, where <key> is the first unique node name found in the xml.
+#
+sequential 0
+#
+max_time 360
+omp_num_threads 4
+full_data.interval 240
+full_data.enable true
+SVG.interval 2880
+SVG.enable true
+#
+folder base_parameters
+run_it dummy
+#
+folder  rCD8recruit025
+CD8_max_recruitment_rate 1e-9
+run_it dummy
+#
+folder  rCD8recruit075
+CD8_max_recruitment_rate 3e-9
+run_it dummy
+#
+folder  rCD8recruit125
+CD8_max_recruitment_rate 5e-9
+run_it dummy
+#
+folder  rCD8recruit175
+CD8_max_recruitment_rate 7e-9
+run_it dummy
+#
+folder  rCD8recruit225
+CD8_max_recruitment_rate 9e-9
+run_it dummy
+#
+folder  rMrecruit025
+CD8_max_recruitment_rate 4e-9
+macrophage_max_recruitment_rate 1e-9
+run_it dummy
+#
+folder  rMrecruit075
+macrophage_max_recruitment_rate 3e-9
+run_it dummy
+#
+folder  rMrecruit125
+macrophage_max_recruitment_rate 5e-9
+run_it dummy
+#
+folder  rMrecruit175
+macrophage_max_recruitment_rate 7e-9
+run_it dummy
+#
+folder  rMrecruit225
+macrophage_max_recruitment_rate 9e-9
+run_it dummy
+#
+folder  rNrecruit025
+macrophage_max_recruitment_rate 4e-9
+neutrophil_max_recruitment_rate 1e-9
+run_it dummy
+#
+folder  rNrecruit075
+neutrophil_max_recruitment_rate 3e-9
+run_it dummy
+#
+folder  rNrecruit125
+neutrophil_max_recruitment_rate 5e-9
+run_it dummy
+#
+folder  rNrecruit175
+neutrophil_max_recruitment_rate 7e-9
+run_it dummy
+#
+folder  rNrecruit225
+neutrophil_max_recruitment_rate 9e-9
+run_it dummy

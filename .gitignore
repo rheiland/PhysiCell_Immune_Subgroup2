@@ -1,0 +1,7 @@
+output\*.xml
+output\*.mat
+output\*.svg
+output\*png
+matlab codes\*.xml
+matlab codes\*.svg
+matlab codes\*.png
