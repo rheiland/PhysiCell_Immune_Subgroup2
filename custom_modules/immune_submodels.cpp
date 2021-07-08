@@ -427,11 +427,11 @@ void CD8_Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	static int apoptosis_index = pCell->phenotype.death.find_death_model_index( "apoptosis" ); 
 	
-	if(virus_amount<1e-6)
-	{
-		pCell->phenotype.cycle.data.transition_rate(cycle_G0G1_index,cycle_S_index) = 0; 
-		pCell->phenotype.death.rates[apoptosis_index] = parameters.doubles("Death_rates_of_old_Tcells"); // new death rate of T cells when they have exceeded generation
-	}			
+	//if(virus_amount<1e-10)
+	//{
+	//	pCell->phenotype.cycle.data.transition_rate(cycle_G0G1_index,cycle_S_index) = 0; 
+	//	pCell->phenotype.death.rates[apoptosis_index] = parameters.doubles("Death_rates_of_old_Tcells"); // new death rate of T cells when they have exceeded generation
+	//}			
 	
 	// ***********************************************
 	//int cycle_G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase ); 
@@ -766,8 +766,10 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 				}	
 				
 				// activate the cell ONLY if the dead cell contains virus
-				if(pTestCell->custom_data["Vnuc"]>parameters.doubles("Infection_detection_threshold")/Vvoxel)
+				if(pTestCell->phenotype.molecular.internalized_total_substrates[vtest_external]>parameters.doubles("Infection_detection_threshold")/Vvoxel)
 				{
+					std::cout<<"Cell died with virus inside activates mac"<<std::endl;
+					
 					phenotype.secretion.secretion_rates[proinflammatory_cytokine_index] = 
 						pCell->custom_data["activated_cytokine_secretion_rate"]; // 10;
 					phenotype.secretion.saturation_densities[proinflammatory_cytokine_index] = 1;
@@ -801,8 +803,10 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 				
 				
 								// activate the cell ONLY if the dead cell contains virus
-				if(pTestCell->custom_data["Vnuc"]>parameters.doubles("Infection_detection_threshold")/Vvoxel)
-				{
+				if(pTestCell->phenotype.molecular.internalized_total_substrates[vtest_external]>parameters.doubles("Infection_detection_threshold")/Vvoxel)
+				{					
+					std::cout<<"DC dying with virus activates mac"<<std::endl;
+					
 					phenotype.secretion.secretion_rates[proinflammatory_cytokine_index] = 
 						pCell->custom_data["activated_cytokine_secretion_rate"]; // 10;
 					phenotype.secretion.saturation_densities[proinflammatory_cytokine_index] = 1;
@@ -987,11 +991,14 @@ void neutrophil_mechanics( Cell* pCell, Phenotype& phenotype, double dt )
 // (Adrianne) DC phenotype function
 void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	// check DCs can uptake virus
+	
+	//check DCs can die
+	
 	
 	//std::cout<<"DC phenotype"<<std::endl;
 	// (Adrianne) get type of CD8+ T cell
 	static int CD8_Tcell_type = get_cell_definition( "CD8 Tcell" ).type;
-	static int apoptosis_index = phenotype.death.find_death_model_index( "apoptosis" ); 
 	
 	// (Adrianne) if DC is already activated, then check whether it leaves the tissue
 	if( pCell->custom_data["activated_immune_cell"] >  0.5 && UniformRandom() < parameters.doubles("prob_DC_leaves"))
@@ -1011,6 +1018,7 @@ void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 	else if( pCell->custom_data["activated_immune_cell"] > 0.5 ) // (Adrianne) activated DCs that don't leave the tissue can further activate CD8s increasing their proliferation rate and attachment rates
 	{
+		//Activated DCs do have a death rate		
 		
 		std::vector<Cell*> neighbors = pCell->cells_in_my_container(); // (Adrianne) find cells in a neighbourhood of DCs
 		int n = 0; 
@@ -1124,11 +1132,63 @@ void DC_mechanics( Cell* pCell, Phenotype& phenotype, double dt )
 // (Adrianne CD4 phenotype function
 void CD4_Tcell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	int cycle_G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase ); 
+	int cycle_S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase ); 
+	static int virus_index = microenvironment.find_density_index("virion");
+	int nV_external = virus_index;
 	
-	//std::cout<<"CD4 T CELL phenotype"<<std::endl;
+	static int vtest_external = microenvironment.find_density_index( "VTEST" ); 
+	double virus_amount = pCell->nearest_density_vector()[vtest_external];
 	
-	//(Adrianne) currently CD4's don't have any rules
-	return;
+	static int apoptosis_index = pCell->phenotype.death.find_death_model_index( "apoptosis" ); 
+	
+	//if(virus_amount<1e-10)
+	//{
+	//	pCell->phenotype.cycle.data.transition_rate(cycle_G0G1_index,cycle_S_index) = 0; 
+	//	pCell->phenotype.death.rates[apoptosis_index] = parameters.doubles("Death_rates_of_old_Tcells"); // new death rate of T cells when they have exceeded generation
+	//}			
+	
+	// ***********************************************
+	//int cycle_G0G1_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::G0G1_phase ); 
+	//int cycle_S_index = flow_cytometry_separated_cycle_model.find_phase_index( PhysiCell_constants::S_phase ); 
+		
+	// Model for T cell proliferation and death
+	int generation_value = pCell->custom_data["generation"];
+	//std::cout<<"Generation value: "<<generation_value<<std::endl; // print out to command line "generation_value"
+	
+	if(pCell->phenotype.cycle.data.elapsed_time_in_phase<6 &&  pCell->phenotype.cycle.data.current_phase_index==0)
+	{
+		pCell->custom_data["generation"] -= 1;
+	}
+	if(generation_value<0)
+	{
+		// turn death rate up
+		//print death rate
+		//std::cout<<"CD8 Death rate before: " <<pCell->phenotype.death.rates[apoptosis_index]<<std::endl;
+		pCell->phenotype.death.rates[apoptosis_index] = parameters.doubles("Death_rates_of_old_Tcells");
+		//pCell->phenotype.death.rates[apoptosis_index] = 100; // new death rate of T cells when they have exceeded generation
+		//std::cout<<"CD8 Death rate after change:  " <<pCell->phenotype.death.rates[apoptosis_index]<<std::endl;
+		// turn proliferate rate off
+	    //(to do this, access the index for the flow cytometry proliferation model, like the apoptosis model, and change the transition rate)
+		pCell->phenotype.cycle.data.transition_rate(cycle_G0G1_index,cycle_S_index) = 0;
+		//std::cout<<"Cell is now old and has generation: "<<generation_value<<std::endl;
+	}
+	// ***********************************************
+	
+	
+	static int debris_index = microenvironment.find_density_index( "debris");
+	
+	if( phenotype.death.dead == true )
+	{
+		pCell->functions.update_phenotype = NULL;
+		pCell->functions.custom_cell_rule = NULL; 
+
+		phenotype.secretion.secretion_rates[debris_index] = pCell->custom_data["debris_secretion_rate"]; 
+		return; 
+	}
+
+	return; 
+	
 }
 
 // (Adrianne) CD4 mechanics function
