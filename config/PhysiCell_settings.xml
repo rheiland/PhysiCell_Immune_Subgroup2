@@ -829,7 +829,7 @@
 			<Death_rates_of_old_Tcells type="double" units="none"
 				description="Death rate of old T cells">100</Death_rates_of_old_Tcells>	
 			<prob_DC_leaves type="double" units="dimensionless"
-				description="Probability DC leaves tissue">0.002</prob_DC_leaves>
+				description="Probability DC leaves tissue">0.0002</prob_DC_leaves>
 
 			<!-- epithelial cell parameters -->			
 			<IC_50_IFN type="double" units="cells" 

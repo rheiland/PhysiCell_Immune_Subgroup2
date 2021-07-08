@@ -766,9 +766,9 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 				}	
 				
 				// activate the cell ONLY if the dead cell contains virus
-				if(pTestCell->phenotype.molecular.internalized_total_substrates[vtest_external]>parameters.doubles("Infection_detection_threshold")/Vvoxel)
+				if(pTestCell->phenotype.molecular.internalized_total_substrates[vtest_external]>1/Vvoxel)
 				{
-					std::cout<<"Cell died with virus inside activates mac"<<std::endl;
+					std::cout<<"Cell died with virus inside => activates mac"<<std::endl;
 					
 					phenotype.secretion.secretion_rates[proinflammatory_cytokine_index] = 
 						pCell->custom_data["activated_cytokine_secretion_rate"]; // 10;
@@ -803,7 +803,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 				
 				
 								// activate the cell ONLY if the dead cell contains virus
-				if(pTestCell->phenotype.molecular.internalized_total_substrates[vtest_external]>parameters.doubles("Infection_detection_threshold")/Vvoxel)
+				if(pTestCell->phenotype.molecular.internalized_total_substrates[vtest_external]>1/Vvoxel)
 				{					
 					std::cout<<"DC dying with virus activates mac"<<std::endl;
 					
@@ -990,12 +990,7 @@ void neutrophil_mechanics( Cell* pCell, Phenotype& phenotype, double dt )
 }
 // (Adrianne) DC phenotype function
 void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	// check DCs can uptake virus
-	
-	//check DCs can die
-	
-	
+{	
 	//std::cout<<"DC phenotype"<<std::endl;
 	// (Adrianne) get type of CD8+ T cell
 	static int CD8_Tcell_type = get_cell_definition( "CD8 Tcell" ).type;
@@ -1005,7 +1000,7 @@ void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	{
 		extern double DM; //declare existance of DC lymph
 		// (Adrianne) DC leaves the tissue and so we lyse that DC
-		std::cout<<"DC leaves tissue"<<std::endl;
+		//std::cout<<"DC leaves tissue"<<std::endl;
 		
 		// adding a flag to say, "I'm a DC and I left the tissue, I didn't die, so don't eat me!"
 		pCell->custom_data["DC_leaving_not_dying"]=1.0;
@@ -1099,7 +1094,6 @@ void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 // (Adrianne) DC mechanics function
 void DC_mechanics( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	
 	//std::cout<<"DC mechanics"<<std::endl;
 	
 	static int debris_index = microenvironment.find_density_index( "debris");
