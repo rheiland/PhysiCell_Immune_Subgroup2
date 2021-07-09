@@ -12,19 +12,19 @@ full_data.enable true
 SVG.interval 2880
 SVG.enable true
 #
-folder Vdiffusion20IFNIC5020
-microenvironment_setup.variable[@ID='6'].diffusion_coefficient 20
+folder Vdiffusion5IFNIC5020
+#microenvironment_setup.variable[@ID='6'].diffusion_coefficient 20
 IC_50_IFN 20
 run_it dummy
 #
-folder  Vdiffusion20IFNIC5060
+folder  Vdiffusion5IFNIC5060
 IC_50_IFN 60
 run_it dummy
 #
-folder  Vdiffusion20IFNIC50100
+folder  Vdiffusion5IFNIC50100
 IC_50_IFN 100
 run_it dummy
 #
-folder  Vdiffusion20IFNIC50180
+folder  Vdiffusion5IFNIC50180
 IC_50_IFN 180
 run_it dummy

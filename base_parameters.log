@@ -1,4 +1,4 @@
-Using config file base_parameters_run1\config.xml ... 
+Using config file base_parameters\config.xml ... 
 0
 dc? 0
 User parameters in XML config file: 
@@ -956,10 +956,10 @@ See ALL_CITATIONS.txt for this list.
 
 ***** This is COVID19 integrated version 0.4.0. *****
 
-current simulated time: 0 min (max: 17280 min)
+current simulated time: 0 min (max: 360 min)
 total agents: 180621
-interval wall time: 0 days, 0 hours, 0 minutes, and 0.0001999 seconds 
-total wall time: 0 days, 0 hours, 0 minutes, and 0.0002078 seconds 
+interval wall time: 0 days, 0 hours, 0 minutes, and 0.0002475 seconds 
+total wall time: 0 days, 0 hours, 0 minutes, and 0.0002587 seconds 
 
 
 Using method diffusion_decay_solver__constant_coefficients_LOD_2D (2D LOD with Thomas Algorithm) ... 

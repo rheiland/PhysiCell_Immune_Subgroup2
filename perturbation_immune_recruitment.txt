@@ -3,7 +3,7 @@
 # Allows for changing parameters in .xml, running sim, and writing results to different folders.
 # <key> <value> pairs, where <key> is the first unique node name found in the xml.
 #
-sequential 0
+#sequential 0
 #
 max_time 360
 omp_num_threads 4

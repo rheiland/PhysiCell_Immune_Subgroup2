@@ -1,4 +1,4 @@
-Using config file base_parameters_run1\config.xml ... 
+Using config file Vdiffusion5IFNIC5020\config.xml ... 
 0
 dc? 0
 User parameters in XML config file: 
@@ -55,7 +55,7 @@ Infection_detection_threshold: 10 [none]
 Death_rates_of_old_Tcells: 100 [none]
 prob_DC_leaves: 0.002 [dimensionless]
 DC_half: 100 [dimensionless]
-IC_50_IFN: 60 [cells]
+IC_50_IFN: 20 [cells]
 IFN_secretion_rate: 0.08 [cells]
 epithelial_cell_proliferation_rate: 0.0005167 [none]
 infected_cell_death_rate: 5.31667e-005 [1/min]
@@ -150,9 +150,9 @@ Densities: (7 total)
      boundary condition: 0 mol/micron^3 (enabled: false)
    VTEST:
      units: virions/micron^3
-     diffusion coefficient: 5 micron^2 / min
+     diffusion coefficient: 20 micron^2 / min
      decay rate: 0.039 min^-1
-     diffusion length scale: 11.3228 micron
+     diffusion length scale: 22.6455 micron
      initial condition: 0 virions/micron^3
      boundary condition: 0 virions/micron^3 (enabled: false)
 
@@ -947,22 +947,3 @@ Submodel: epithelium model (Version 0.4.0)
 		VRel: 0 virions
 	custom vector data: 
 			NOTE: custom vector data will eventually be merged with custom data
-Using PhysiCell version 1.7.2beta
-	Please cite DOI: 10.1371/journal.pcbi.1005991
-	Project website: http://PhysiCell.MathCancer.org
-
-See ALL_CITATIONS.txt for this list.
-
-
-***** This is COVID19 integrated version 0.4.0. *****
-
-current simulated time: 0 min (max: 17280 min)
-total agents: 180621
-interval wall time: 0 days, 0 hours, 0 minutes, and 0.0001999 seconds 
-total wall time: 0 days, 0 hours, 0 minutes, and 0.0002078 seconds 
-
-
-Using method diffusion_decay_solver__constant_coefficients_LOD_2D (2D LOD with Thomas Algorithm) ... 
-
-Warning and FYI: Very small vectors are normalized to 0 vector
-
