@@ -730,7 +730,7 @@
 			<number_of_neutrophils type="int" units="none" 
 				description="initial number of neutrophils">0</number_of_neutrophils>
 			<number_of_DCs type="int" units="cells" 
-				description="DC0: initial number of Dendritic Cells">100</number_of_DCs> <!-- 1798-->
+				description="DC0: initial number of Dendritic Cells">1798</number_of_DCs> <!-- 1798-->
 			<number_of_CD4_Tcells type="int" units="none" 
 				description="initial number of CD4 Tcells in tissue">0</number_of_CD4_Tcells> 
 			<perecentage_tissue_vascularized type="double" units="percentage" 

@@ -13,7 +13,7 @@ Number_of_virion_arrival_points: 5 [virions]
 number_of_CD8_Tcells: 0 [none]
 number_of_macrophages: 640 [none]
 number_of_neutrophils: 0 [none]
-number_of_DCs: 100 [cells]
+number_of_DCs: 1798 [cells]
 number_of_CD4_Tcells: 0 [none]
 large_bron: 120 [microns]
 small_bron: 60 [microns]
@@ -56,7 +56,7 @@ Death_rates_of_old_Tcells: 100 [none]
 prob_DC_leaves: 0.002 [dimensionless]
 DC_half: 100 [dimensionless]
 IC_50_IFN: 60 [cells]
-IFN_secretion_rate: 0.1 [cells]
+IFN_secretion_rate: 0.08 [cells]
 epithelial_cell_proliferation_rate: 0.0005167 [none]
 infected_cell_death_rate: 5.31667e-005 [1/min]
 kAtthi: 0.0013 [1/site/min]
@@ -100,11 +100,11 @@ Microenvironment summary: microenvironment:
 
 Mesh information: 
 type: uniform Cartesian
-Domain: [-1000,1000] micron x [-1000,1000] micron x [-10,10] micron
+Domain: [-4000,4000] micron x [-2500,2500] micron x [-10,10] micron
    resolution: dx = 20 micron
-   voxels: 10000
+   voxels: 100000
    voxel faces: 0
-   volume: 8e+007 cubic micron
+   volume: 8e+008 cubic micron
 Densities: (7 total)
    virion:
      units: copies/micron^3
@@ -957,12 +957,7 @@ See ALL_CITATIONS.txt for this list.
 ***** This is COVID19 integrated version 0.4.0. *****
 
 current simulated time: 0 min (max: 17280 min)
-total agents: 18617
-interval wall time: 0 days, 0 hours, 0 minutes, and 0.0002453 seconds 
-total wall time: 0 days, 0 hours, 0 minutes, and 0.0002538 seconds 
-
-
-Using method diffusion_decay_solver__constant_coefficients_LOD_2D (2D LOD with Thomas Algorithm) ... 
-
-Warning and FYI: Very small vectors are normalized to 0 vector
+total agents: 180621
+interval wall time: 0 days, 0 hours, 0 minutes, and 0.0002294 seconds 
+total wall time: 0 days, 0 hours, 0 minutes, and 0.0002374 seconds 
 
