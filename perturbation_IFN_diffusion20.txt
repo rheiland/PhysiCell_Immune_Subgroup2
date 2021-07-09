@@ -5,11 +5,11 @@
 #
 #sequential 0
 #
-max_time 360
+max_time 17280
 omp_num_threads 4
 full_data.interval 240
 full_data.enable true
-SVG.interval 2880
+SVG.interval  17280
 SVG.enable true
 #
 folder Vdiffusion20IFNIC5020

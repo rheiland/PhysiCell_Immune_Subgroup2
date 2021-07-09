@@ -733,7 +733,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 					double time_to_ingest = volume_ingested_cell*material_internalisation_rate;// convert volume to time taken to phagocytose
 					// (Adrianne) update internal time vector in macrophages that tracks time it will spend phagocytosing the material so they can't phagocytose again until this time has elapsed
 					pCell->custom_data.variables[time_to_next_phagocytosis_index].value = PhysiCell_globals.current_time+time_to_ingest;				
-					std::cout<<"macrophage ate infected cell"<<std::endl;
+					//std::cout<<"macrophage ate infected cell"<<std::endl;
 				}	
 
 				// activate the cell 
