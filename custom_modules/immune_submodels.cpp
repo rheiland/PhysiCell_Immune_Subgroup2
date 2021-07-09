@@ -733,6 +733,7 @@ void macrophage_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 					double time_to_ingest = volume_ingested_cell*material_internalisation_rate;// convert volume to time taken to phagocytose
 					// (Adrianne) update internal time vector in macrophages that tracks time it will spend phagocytosing the material so they can't phagocytose again until this time has elapsed
 					pCell->custom_data.variables[time_to_next_phagocytosis_index].value = PhysiCell_globals.current_time+time_to_ingest;				
+					std::cout<<"macrophage ate infected cell"<<std::endl;
 				}	
 
 				// activate the cell 
@@ -1595,6 +1596,9 @@ void immune_cell_recruitment( double dt )
 			// (signal(x)-signal_min)/(signal_max/signal_min)
 			double dRate = ( microenvironment(n)[proinflammatory_cytokine_index] - CD8_min_signal ); 
 			dRate /=CD8_max_minus_min; 
+			
+			extern double DM;
+			dRate += DM/(parameters.doubles("DC_half")+DM);
 			// crop to [0,1] 
 			if( dRate > 1 ) 
 			{ dRate = 1; } 
@@ -1606,7 +1610,7 @@ void immune_cell_recruitment( double dt )
 		total_scaled_signal = total_rate; 
 		
 		total_rate *= microenvironment.mesh.dV; 
-		total_rate *= neutrophil_recruitment_rate; 
+		total_rate *= CD8_recruitment_rate; 
 
 		// expected number of new neutrophils 
 		number_of_new_cells_prob = total_rate * elapsed_time ; 

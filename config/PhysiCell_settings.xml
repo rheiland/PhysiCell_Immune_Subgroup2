@@ -319,7 +319,7 @@
 			
 							<!-- ********************************************* -->
 				<generation units="dimensionless" type="int"
-					description="cell proliferation generation">1</generation>
+					description="cell proliferation generation">3</generation>
 				<!-- ********************************************* -->
 				<!-- for internal viral dynamics --> 
 				<!--<virion units="virions" type="double"
@@ -362,7 +362,7 @@
 					desription="Threshold volume for neutrophil exhaustion">1581</threshold_neutrophil_volume>
 				<!-- (adrianne) death rate of exhausted macrophages is 5x faster than death rate in activated macrophages, need a motivation for this death rate from the literature --> 
 				<exhausted_macrophage_death_rate units="1/min" type="double" 
-					desription="Threshold volume for neutrophil exhaustion">0.01</exhausted_macrophage_death_rate>
+					desription="Threshold volume for neutrophil exhaustion">0.0001</exhausted_macrophage_death_rate>
 				<!-- (adrianne) boolean parameter for whether macrophages has been activated by a T cell to be able to phagocytose infected cells --> 
 				<ability_to_phagocytose_infected_cell units="dimensionless" type="int"
 					description="Boolean for whether macrophages can phagocytose infected cells">0</ability_to_phagocytose_infected_cell>
@@ -773,23 +773,23 @@
 				
 			<!-- immune recruitment rates -->			
 			<CD8_max_recruitment_rate type="double" units="cells/min/micron^3"
-				description="rCD8recruit: max CD8 recruitment rate (for saturated signal)">6e-9</CD8_max_recruitment_rate> <!-- 4e-9 debug -->
+				description="rCD8recruit: max CD8 recruitment rate (for saturated signal)">8e-9</CD8_max_recruitment_rate> <!-- 4e-9 debug -->
 			<CD8_recruitment_min_signal type="double" units="substrate/micron^3"
-				description="RminCD8: min concentration to attract CD8">0.15</CD8_recruitment_min_signal> <!--0.1 debug -->
+				description="RminCD8: min concentration to attract CD8">0.1</CD8_recruitment_min_signal> <!--0.1 debug -->
 			<CD8_recruitment_saturation_signal type="double" units="substrate/micron^3"
-				description="RsatCD8: saturating concentration to attract CD8">0.4</CD8_recruitment_saturation_signal> <!-- 0.3 debug -->
+				description="RsatCD8: saturating concentration to attract CD8">0.3</CD8_recruitment_saturation_signal> <!-- 0.3 debug -->
 			<macrophage_max_recruitment_rate type="double" units="cells/min/micron^3"
-				description="rMrecruit: max macrophage recruitment rate (for saturated signal)">1e-9</macrophage_max_recruitment_rate> <!-- 4e-9 debug -->
+				description="rMrecruit: max macrophage recruitment rate (for saturated signal)">4e-9</macrophage_max_recruitment_rate> <!-- 4e-9 debug -->
 			<macrophage_recruitment_min_signal type="double" units="substrate/micron^3"
 				description="RminM: min concentration to attract macrophages">0.1</macrophage_recruitment_min_signal> <!--0.1 debug -->
 			<macrophage_recruitment_saturation_signal type="double" units="substrate/micron^3"
-				description="RsatM: saturating concentration to attract macrophages">0.5</macrophage_recruitment_saturation_signal> <!-- 0.3 debug -->
+				description="RsatM: saturating concentration to attract macrophages">0.4</macrophage_recruitment_saturation_signal> <!-- 0.3 debug -->
 			<neutrophil_max_recruitment_rate type="double" units="cells/min/micron^3"
-				description="rNrecuit: max neutrophil recruitment rate (for saturated signal)">1e-9</neutrophil_max_recruitment_rate> <!-- 4e-9 debug -->
+				description="rNrecuit: max neutrophil recruitment rate (for saturated signal)">2e-9</neutrophil_max_recruitment_rate> <!-- 4e-9 debug -->
 			<neutrophil_recruitment_min_signal type="double" units="substrate/micron^3"
-				description="RminN: min concentration to attract neutrophils">0.05</neutrophil_recruitment_min_signal> <!--0.1 debug -->
+				description="RminN: min concentration to attract neutrophils">0.1</neutrophil_recruitment_min_signal> <!--0.1 debug -->
 			<neutrophil_recruitment_saturation_signal type="double" units="substrate/micron^3"
-				description="RsatN: saturating concentration to attract neutrophils">0.5</neutrophil_recruitment_saturation_signal> <!-- 0.3 debug -->
+				description="RsatN: saturating concentration to attract neutrophils">0.4</neutrophil_recruitment_saturation_signal> <!-- 0.3 debug -->
 					
 			<!-- virus parameters --> 
 			<virus_fraction_released_at_death type="double" units="none" 
@@ -829,7 +829,9 @@
 			<Death_rates_of_old_Tcells type="double" units="none"
 				description="Death rate of old T cells">100</Death_rates_of_old_Tcells>	
 			<prob_DC_leaves type="double" units="dimensionless"
-				description="Probability DC leaves tissue">0.0002</prob_DC_leaves>
+				description="Probability DC leaves tissue">0.002</prob_DC_leaves>
+			<DC_half type="double" unit="Cells"
+				description="Half effect DCs">100</DC_half>
 
 			<!-- epithelial cell parameters -->			
 			<IC_50_IFN type="double" units="cells" 

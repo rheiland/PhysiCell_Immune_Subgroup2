@@ -218,7 +218,7 @@ int main( int argc, char* argv[] )
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
 			//external_immune_main_model( diffusion_dt );
-			//external_immune_model( diffusion_dt );
+			external_immune_model( diffusion_dt );
 			
 			//external_immune_main_model( diffusion_dt );
 			//lymph_node_DCs_model( diffusion_dt );
