@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-1000</x_min>
-		<x_max>1000</x_max>
-		<y_min>-1000</y_min>
-		<y_max>1000</y_max>
+		<x_min>-4000</x_min>
+		<x_max>4000</x_max>
+		<y_min>-2500</y_min>
+		<y_max>2500</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">21600</max_time> <!-- 14400    8640, 5 days * 24 h * 60 min,  12 days = 17280-->
+		<max_time units="min">17280</max_time> <!-- 14400    8640, 5 days * 24 h * 60 min,  12 days = 17280-->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -108,12 +108,12 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">60</interval><!-- 240 -->
+			<interval units="min">240</interval><!-- 240 -->
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">60</interval><!-- 2880-->
+			<interval units="min">17280</interval><!-- 2880 17280-->
 			<enable>true</enable>
 		</SVG>
 		
@@ -837,7 +837,7 @@
 			<IC_50_IFN type="double" units="cells" 
 				description="IFN half effect on viral efficacy">60</IC_50_IFN><!-- 30 -->
 			<IFN_secretion_rate type="double" units="cells" 
-				description="IFN secretion rate from infected cells">0.1</IFN_secretion_rate> <!-- -->
+				description="IFN secretion rate from infected cells">0.08</IFN_secretion_rate> <!-- -->
 			<epithelial_cell_proliferation_rate type="double" units="none"
 				description="Rate that epithelial cells proliferate">5.167e-4</epithelial_cell_proliferation_rate>
 			<infected_cell_death_rate type="double" units="1/min"
