@@ -113,7 +113,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">17280</interval><!-- 2880 17280-->
+			<interval units="min">2880</interval><!-- 2880 17280-->
 			<enable>true</enable>
 		</SVG>
 		
@@ -832,6 +832,8 @@
 				description="Probability DC leaves tissue">0.002</prob_DC_leaves>
 			<DC_half type="double" unit="Cells"
 				description="Half effect DCs">100</DC_half>
+			<DM_clearance_rate type="double" unit="1/min"
+				description="decay rate of lymph DCs">0.01</DM_clearance_rate>
 
 			<!-- epithelial cell parameters -->			
 			<IC_50_IFN type="double" units="cells" 

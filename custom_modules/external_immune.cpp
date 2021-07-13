@@ -30,7 +30,8 @@ void external_immune_model_setup( void )
 
 void external_immune_model( double dt )
 {
-	
+	extern double DM;
+	DM -= DM*parameters.doubles("DM_clearance_rate")*dt;
 	
 	return; 
 }

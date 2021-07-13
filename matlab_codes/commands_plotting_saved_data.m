@@ -1,5 +1,5 @@
 load('simulated_data.mat')
-timetotal = 360;
+timetotal = 72;
 hours_to_days = linspace(0,15,timetotal);
  
  figure

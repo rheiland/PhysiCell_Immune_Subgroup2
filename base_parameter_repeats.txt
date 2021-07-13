@@ -1,5 +1,5 @@
 # File to be used with params_run.py
-# This file runs sequential changes in recruitment rate parameters for macrophages/neutrophils and T cells
+# This file runs the base parameters 10 times
 # Allows for changing parameters in .xml, running sim, and writing results to different folders.
 # <key> <value> pairs, where <key> is the first unique node name found in the xml.
 #
@@ -9,22 +9,20 @@ max_time 17280
 omp_num_threads 4
 full_data.interval 240
 full_data.enable true
-SVG.interval 2880
+SVG.interval 17280
 SVG.enable true
 #
-folder Vdiffusion1IFNIC5020
-microenvironment_setup.variable[@ID='6'].diffusion_coefficient 1
-IC_50_IFN 20
+folder base_parameters_run1
 run_it dummy
 #
-folder  Vdiffusion1IFNIC5060
-IC_50_IFN 60
+folder base_parameters_run2
 run_it dummy
 #
-folder  Vdiffusion1IFNIC50100
-IC_50_IFN 100
+folder base_parameters_run3
 run_it dummy
 #
-folder  Vdiffusion1IFNIC50180
-IC_50_IFN 180
+folder base_parameters_run4
+run_it dummy
+#
+folder base_parameters_run5
 run_it dummy
