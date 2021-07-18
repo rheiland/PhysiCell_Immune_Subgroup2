@@ -74,90 +74,89 @@
 namespace PhysiCell
 {
 	
-// class PhysiCell_constants
-namespace PhysiCell_constants
+class PhysiCell_constants
 {
-//  public:
-	extern const double pi;
+ public:
+	static constexpr double pi=3.1415926535897932384626433832795;
 	
-	extern const double cell_removal_threshold_volume; // 20 cubic microns -- about 1% of typical cell 
-	extern const int keep_pushed_out_cells_in_outer_voxel;
-	extern const int solid_boundary;
-	extern const int default_boundary_condition_for_pushed_out_agents;		
+	static constexpr double cell_removal_threshold_volume = 20; // 20 cubic microns -- about 1% of typical cell 
+
+	static const int keep_pushed_out_cells_in_outer_voxel;
+	static const int solid_boundary;
+	static const int default_boundary_condition_for_pushed_out_agents;		
 	
-	extern const int deterministic_necrosis;
-	extern const int stochastic_necrosis;
+	static const int deterministic_necrosis;
+	static const int stochastic_necrosis;
 	
-	extern const int mesh_min_x_index;
-	extern const int mesh_min_y_index;
-	extern const int mesh_min_z_index;
-	extern const int mesh_max_x_index;
-	extern const int mesh_max_y_index;
-	extern const int mesh_max_z_index;			
+	static const int mesh_min_x_index;
+	static const int mesh_min_y_index;
+	static const int mesh_min_z_index;
+	static const int mesh_max_x_index;
+	static const int mesh_max_y_index;
+	static const int mesh_max_z_index;			
 	
-	extern const int mesh_lx_face_index;
-	extern const int mesh_ly_face_index;
-	extern const int mesh_lz_face_index;
-	extern const int mesh_ux_face_index;
-	extern const int mesh_uy_face_index;
-	extern const int mesh_uz_face_index;
+	static const int mesh_lx_face_index;
+	static const int mesh_ly_face_index;
+	static const int mesh_lz_face_index;
+	static const int mesh_ux_face_index;
+	static const int mesh_uy_face_index;
+	static const int mesh_uz_face_index;
 	
 	// currently recognized cell cycle models 
-	extern const int advanced_Ki67_cycle_model;
-	extern const int basic_Ki67_cycle_model;
-	extern const int flow_cytometry_cycle_model;
-	extern const int live_apoptotic_cycle_model;
-	extern const int total_cells_cycle_model;
-	extern const int live_cells_cycle_model; 
-	extern const int flow_cytometry_separated_cycle_model; 
-	extern const int cycling_quiescent_model; 
+	static const int advanced_Ki67_cycle_model;
+	static const int basic_Ki67_cycle_model;
+	static const int flow_cytometry_cycle_model;
+	static const int live_apoptotic_cycle_model;
+	static const int total_cells_cycle_model;
+	static const int live_cells_cycle_model; 
+	static const int flow_cytometry_separated_cycle_model; 
+	static const int cycling_quiescent_model; 
 	
 	// currently recognized death models 
-	extern const int apoptosis_death_model; 
-	extern const int necrosis_death_model; 
-	extern const int autophagy_death_model; 
+	static const int apoptosis_death_model; 
+	static const int necrosis_death_model; 
+	static const int autophagy_death_model; 
 	
-	extern const int custom_cycle_model; 
+	static const int custom_cycle_model; 
 	
 	// currently recognized cell cycle and death phases 
 	// cycle phases
-	extern const int Ki67_positive_premitotic; 
-	extern const int Ki67_positive_postmitotic; 
-	extern const int Ki67_positive; 
-	extern const int Ki67_negative; 
-	extern const int G0G1_phase;
-	extern const int G0_phase;
-	extern const int G1_phase; 
-	extern const int G1a_phase; 
-	extern const int G1b_phase;
-	extern const int G1c_phase;
-	extern const int S_phase;
-	extern const int G2M_phase;
-	extern const int G2_phase;
-	extern const int M_phase;
-	extern const int live;
+	static const int Ki67_positive_premitotic; 
+	static const int Ki67_positive_postmitotic; 
+	static const int Ki67_positive; 
+	static const int Ki67_negative; 
+	static const int G0G1_phase;
+	static const int G0_phase;
+	static const int G1_phase; 
+	static const int G1a_phase; 
+	static const int G1b_phase;
+	static const int G1c_phase;
+	static const int S_phase;
+	static const int G2M_phase;
+	static const int G2_phase;
+	static const int M_phase;
+	static const int live;
 	
-	extern const int G1pm_phase;
-	extern const int G1ps_phase; 
+	static const int G1pm_phase;
+	static const int G1ps_phase; 
 	
-	extern const int cycling; 
-	extern const int quiescent; 
+	static const int cycling; 
+	static const int quiescent; 
 	
 	
-	extern const int custom_phase;
+	static const int custom_phase;
 	// death phases
-	extern const int apoptotic;
-	extern const int necrotic_swelling;
-	extern const int necrotic_lysed;
-	extern const int necrotic; 
-	extern const int debris; 
-}
+	static const int apoptotic;
+	static const int necrotic_swelling;
+	static const int necrotic_lysed;
+	static const int necrotic; 
+	static const int debris; 
+};
 extern std::string time_units;
 extern std::string space_units;
 extern double diffusion_dt; 
 extern double mechanics_dt;
 extern double phenotype_dt;
-extern double intracellular_dt;
 
 
 extern std::unordered_map<std::string,int> cycle_model_codes;

@@ -109,12 +109,12 @@
 		<folder>rwh1</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">10</interval><!-- 240 -->
+			<interval units="min">240</interval><!-- 240 -->
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">10</interval><!-- 2880 17280-->
+			<interval units="min">240</interval><!-- 2880 17280-->
 			<enable>true</enable>
 		</SVG>
 		
