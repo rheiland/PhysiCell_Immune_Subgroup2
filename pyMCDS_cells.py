@@ -6,7 +6,7 @@ import sys
 import warnings
 from pathlib import Path
 
-class pyMCDS:
+class pyMCDS_cells:
     """
     This class contains a dictionary of dictionaries that contains all of the 
     output from a single time step of a PhysiCell Model. This class assumes that
@@ -325,7 +325,7 @@ class pyMCDS:
         xml_file = output_path / xml_file
         tree = ET.parse(xml_file)
 
-        print('Reading {}'.format(xml_file))
+        # print('Reading {}'.format(xml_file))
 
         root = tree.getroot()
         MCDS = {}
@@ -342,123 +342,123 @@ class pyMCDS:
         MCDS['metadata']['current_runtime'] = float(time_node.text)
         MCDS['metadata']['runtime_units'] = time_node.get('units')
 
-        # find the microenvironment node
-        me_node = root.find('microenvironment')
-        me_node = me_node.find('domain')
+        # # find the microenvironment node
+        # me_node = root.find('microenvironment')
+        # me_node = me_node.find('domain')
 
-        # find the mesh node
-        mesh_node = me_node.find('mesh')
-        MCDS['metadata']['spatial_units'] = mesh_node.get('units')
-        MCDS['mesh'] = {}
+        # # find the mesh node
+        # mesh_node = me_node.find('mesh')
+        # MCDS['metadata']['spatial_units'] = mesh_node.get('units')
+        # MCDS['mesh'] = {}
 
-        # while we're at it, find the mesh
-        coord_str = mesh_node.find('x_coordinates').text
-        delimiter = mesh_node.find('x_coordinates').get('delimiter')
-        x_coords = np.array(coord_str.split(delimiter), dtype=np.float)
+        # # while we're at it, find the mesh
+        # coord_str = mesh_node.find('x_coordinates').text
+        # delimiter = mesh_node.find('x_coordinates').get('delimiter')
+        # x_coords = np.array(coord_str.split(delimiter), dtype=np.float)
 
-        coord_str = mesh_node.find('y_coordinates').text
-        delimiter = mesh_node.find('y_coordinates').get('delimiter')
-        y_coords = np.array(coord_str.split(delimiter), dtype=np.float)
+        # coord_str = mesh_node.find('y_coordinates').text
+        # delimiter = mesh_node.find('y_coordinates').get('delimiter')
+        # y_coords = np.array(coord_str.split(delimiter), dtype=np.float)
 
-        coord_str = mesh_node.find('z_coordinates').text
-        delimiter = mesh_node.find('z_coordinates').get('delimiter')
-        z_coords = np.array(coord_str.split(delimiter), dtype=np.float)
+        # coord_str = mesh_node.find('z_coordinates').text
+        # delimiter = mesh_node.find('z_coordinates').get('delimiter')
+        # z_coords = np.array(coord_str.split(delimiter), dtype=np.float)
 
-        # reshape into a mesh grid
-        xx, yy, zz = np.meshgrid(x_coords, y_coords, z_coords)
+        # # reshape into a mesh grid
+        # xx, yy, zz = np.meshgrid(x_coords, y_coords, z_coords)
 
-        MCDS['mesh']['x_coordinates'] = xx
-        MCDS['mesh']['y_coordinates'] = yy
-        MCDS['mesh']['z_coordinates'] = zz
+        # MCDS['mesh']['x_coordinates'] = xx
+        # MCDS['mesh']['y_coordinates'] = yy
+        # MCDS['mesh']['z_coordinates'] = zz
 
-        # Voxel data must be loaded from .mat file
-        voxel_file = mesh_node.find('voxels').find('filename').text
-        voxel_path = output_path / voxel_file
-        try:
-            initial_mesh = sio.loadmat(voxel_path)['mesh']
-        except:
-            raise FileNotFoundError(
-                "No such file or directory:\n'{}' referenced in '{}'".format(voxel_path, xml_file))
-            sys.exit(1)
+        # # Voxel data must be loaded from .mat file
+        # voxel_file = mesh_node.find('voxels').find('filename').text
+        # voxel_path = output_path / voxel_file
+        # try:
+        #     initial_mesh = sio.loadmat(voxel_path)['mesh']
+        # except:
+        #     raise FileNotFoundError(
+        #         "No such file or directory:\n'{}' referenced in '{}'".format(voxel_path, xml_file))
+        #     sys.exit(1)
 
         # print('Reading {}'.format(voxel_path))
 
-        # center of voxel specified by first three rows [ x, y, z ]
-        # volume specified by fourth row
-        MCDS['mesh']['voxels'] = {}
-        MCDS['mesh']['voxels']['centers'] = initial_mesh[:3, :]
-        MCDS['mesh']['voxels']['volumes'] = initial_mesh[3, :]
+        # # center of voxel specified by first three rows [ x, y, z ]
+        # # volume specified by fourth row
+        # MCDS['mesh']['voxels'] = {}
+        # MCDS['mesh']['voxels']['centers'] = initial_mesh[:3, :]
+        # MCDS['mesh']['voxels']['volumes'] = initial_mesh[3, :]
 
-        # Continuum_variables, unlike in the matlab version the individual chemical
-        # species will be primarily accessed through their names e.g.
-        # MCDS['continuum_variables']['oxygen']['units']
-        # MCDS['continuum_variables']['glucose']['data']
-        MCDS['continuum_variables'] = {}
-        variables_node = me_node.find('variables')
-        file_node = me_node.find('data').find('filename')
+        # # Continuum_variables, unlike in the matlab version the individual chemical
+        # # species will be primarily accessed through their names e.g.
+        # # MCDS['continuum_variables']['oxygen']['units']
+        # # MCDS['continuum_variables']['glucose']['data']
+        # MCDS['continuum_variables'] = {}
+        # variables_node = me_node.find('variables')
+        # file_node = me_node.find('data').find('filename')
 
-        # micro environment data is shape [4+n, len(voxels)] where n is the number
-        # of species being tracked. the first 3 rows represent (x, y, z) of voxel
-        # centers. The fourth row contains the voxel volume. The 5th row and up will
-        # contain values for that species in that voxel.
-        me_file = file_node.text
-        me_path = output_path / me_file
-        # Changes here
-        try:
-            me_data = sio.loadmat(me_path)['multiscale_microenvironment']
-        except:
-            raise FileNotFoundError(
-                "No such file or directory:\n'{}' referenced in '{}'".format(me_path, xml_file))
-            sys.exit(1)
+        # # micro environment data is shape [4+n, len(voxels)] where n is the number
+        # # of species being tracked. the first 3 rows represent (x, y, z) of voxel
+        # # centers. The fourth row contains the voxel volume. The 5th row and up will
+        # # contain values for that species in that voxel.
+        # me_file = file_node.text
+        # me_path = output_path / me_file
+        # # Changes here
+        # try:
+        #     me_data = sio.loadmat(me_path)['multiscale_microenvironment']
+        # except:
+        #     raise FileNotFoundError(
+        #         "No such file or directory:\n'{}' referenced in '{}'".format(me_path, xml_file))
+        #     sys.exit(1)
 
         # print('Reading {}'.format(me_path))
 
-        var_children = variables_node.findall('variable')
+        # var_children = variables_node.findall('variable')
 
-        # we're going to need the linear x, y, and z coordinates later
-        # but we dont need to get them in the loop
-        X, Y, Z = np.unique(xx), np.unique(yy), np.unique(zz)
+        # # we're going to need the linear x, y, and z coordinates later
+        # # but we dont need to get them in the loop
+        # X, Y, Z = np.unique(xx), np.unique(yy), np.unique(zz)
 
-        for si, species in enumerate(var_children):
-            species_name = species.get('name')
-            MCDS['continuum_variables'][species_name] = {}
-            MCDS['continuum_variables'][species_name]['units'] = species.get(
-                'units')
+        # for si, species in enumerate(var_children):
+        #     species_name = species.get('name')
+        #     MCDS['continuum_variables'][species_name] = {}
+        #     MCDS['continuum_variables'][species_name]['units'] = species.get(
+        #         'units')
 
-            # print('Parsing {:s} data'.format(species_name))
+        #     print('Parsing {:s} data'.format(species_name))
 
-            # initialize array for concentration data
-            MCDS['continuum_variables'][species_name]['data'] = np.zeros(xx.shape)
+        #     # initialize array for concentration data
+        #     MCDS['continuum_variables'][species_name]['data'] = np.zeros(xx.shape)
 
-            # travel down one level on tree
-            species = species.find('physical_parameter_set')
+        #     # travel down one level on tree
+        #     species = species.find('physical_parameter_set')
 
-            # diffusion data for each species
-            MCDS['continuum_variables'][species_name]['diffusion_coefficient'] = {}
-            MCDS['continuum_variables'][species_name]['diffusion_coefficient']['value'] \
-                = float(species.find('diffusion_coefficient').text)
-            MCDS['continuum_variables'][species_name]['diffusion_coefficient']['units'] \
-                = species.find('diffusion_coefficient').get('units')
+        #     # diffusion data for each species
+        #     MCDS['continuum_variables'][species_name]['diffusion_coefficient'] = {}
+        #     MCDS['continuum_variables'][species_name]['diffusion_coefficient']['value'] \
+        #         = float(species.find('diffusion_coefficient').text)
+        #     MCDS['continuum_variables'][species_name]['diffusion_coefficient']['units'] \
+        #         = species.find('diffusion_coefficient').get('units')
 
-            # decay data for each species
-            MCDS['continuum_variables'][species_name]['decay_rate'] = {}
-            MCDS['continuum_variables'][species_name]['decay_rate']['value'] \
-                = float(species.find('decay_rate').text)
-            MCDS['continuum_variables'][species_name]['decay_rate']['units'] \
-                = species.find('decay_rate').get('units')
+        #     # decay data for each species
+        #     MCDS['continuum_variables'][species_name]['decay_rate'] = {}
+        #     MCDS['continuum_variables'][species_name]['decay_rate']['value'] \
+        #         = float(species.find('decay_rate').text)
+        #     MCDS['continuum_variables'][species_name]['decay_rate']['units'] \
+        #         = species.find('decay_rate').get('units')
 
-            # store data from microenvironment file as numpy array            
-            # iterate over each voxel
-            for vox_idx in range(MCDS['mesh']['voxels']['centers'].shape[1]):
-                # find the center
-                center = MCDS['mesh']['voxels']['centers'][:, vox_idx]
+        #     # store data from microenvironment file as numpy array            
+        #     # iterate over each voxel
+        #     for vox_idx in range(MCDS['mesh']['voxels']['centers'].shape[1]):
+        #         # find the center
+        #         center = MCDS['mesh']['voxels']['centers'][:, vox_idx]
 
-                i = np.where(np.abs(center[0] - X) < 1e-10)[0][0]
-                j = np.where(np.abs(center[1] - Y) < 1e-10)[0][0]
-                k = np.where(np.abs(center[2] - Z) < 1e-10)[0][0]
+        #         i = np.where(np.abs(center[0] - X) < 1e-10)[0][0]
+        #         j = np.where(np.abs(center[1] - Y) < 1e-10)[0][0]
+        #         k = np.where(np.abs(center[2] - Z) < 1e-10)[0][0]
 
-                MCDS['continuum_variables'][species_name]['data'][j, i, k] \
-                    = me_data[4+si, vox_idx]
+        #         MCDS['continuum_variables'][species_name]['data'][j, i, k] \
+        #             = me_data[4+si, vox_idx]
 
         # in order to get to the good stuff we have to pass through a few different
         # hierarchal levels
@@ -497,7 +497,7 @@ class pyMCDS:
                 "No such file or directory:\n'{}' referenced in '{}'".format(cell_path, xml_file))
             sys.exit(1)
 
-        print('Reading {}'.format(cell_path))
+        # print('Reading {}'.format(cell_path))
 
         for col in range(len(data_labels)):
             MCDS['discrete_cells'][data_labels[col]] = cell_data[col, :]
