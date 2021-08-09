@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-4000</x_min>
-		<x_max>4000</x_max>
-		<y_min>-2500</y_min>
-		<y_max>2500</y_max>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -97,10 +97,11 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>6</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 
 	<options>
+		<virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>		
 		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
 	</options>	
 	
@@ -113,7 +114,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">2880</interval><!-- 2880 17280-->
+			<interval units="min">240</interval><!-- 2880 17280-->
 			<enable>true</enable>
 		</SVG>
 		
@@ -411,6 +412,9 @@
 					description="RNA in the nucleus">0.0</Vnuc>
 				<VRel units="virions" type="double"
 					description="Released virus">0.0</VRel>
+					
+				<antiviral_state_time units="min" type="double"
+					description="time cell becomes antiviral">1e8</antiviral_state_time>
 			
 			</custom_data>
 		</cell_definition>
@@ -890,7 +894,9 @@
 			<!-- antiviral state parameters -->
 			<tau_IFN type="double" units="virions/min"
 				description="Virus release rate">21600</tau_IFN><!-- 14400-->
-				
+			
+			<IFN_delay type="double" units="min"
+				description="delay in IFN signalling">120</IFN_delay>
 							
 	</user_parameters>
 	
