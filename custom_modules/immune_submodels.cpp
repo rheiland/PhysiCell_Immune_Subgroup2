@@ -256,10 +256,15 @@ void choose_initialized_voxels( void )
 	int max_voxel_index = microenvironment.mesh.voxels.size() - 1; 
 	int number_of_vascularized_voxels = (int) ( percentage_vascularised/100.0 * ( max_voxel_index+1) ); 
 
+    static int nBlood = microenvironment.find_density_index( "blood" ); 
+    static int nTamiflu = microenvironment.find_density_index( "Tamiflu" ); 
+
 	 // choose which voxels are veins
 	 for( int n = 0 ; n < number_of_vascularized_voxels ; n++ )
 	 {
 		int index_vascularised_voxel = (int) ( UniformRandom() * max_voxel_index ); 
+        microenvironment(index_vascularised_voxel)[nBlood] = 42.0;  // answer to universe
+        microenvironment(index_vascularised_voxel)[nTamiflu] = 24.0;  // half answer to universe
 		vascularized_voxel_indices.push_back( index_vascularised_voxel ); 
 	 }
 	 
