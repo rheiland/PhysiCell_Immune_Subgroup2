@@ -71,12 +71,10 @@
 #include "./PhysiCell_constants.h"
 #include "./PhysiCell_utilities.h"
 
-#include "./PhysiCell_cell.h"  //rwh - need for pCell->ID, etc.
-
 using namespace BioFVM; 
 
 namespace PhysiCell{
-
+	
 Phase::Phase()
 {
 	index = 0; 
@@ -279,10 +277,7 @@ Phase_Link& Cycle_Model::phase_link( int start_index, int end_index )
 	
 void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 {
-    std::cout << "\n------ rwh: entering P_phenotype.cpp: " << __FUNCTION__ << ":  pCell->ID= " << pCell->ID << ", pCell->type_name= " << pCell->type_name << std::endl;
-
 	int i = phenotype.cycle.data.current_phase_index; 
-    // std::cout << "\n------ rwh: entering P_phenotype.cpp: " << __FUNCTION__ << ":  i = phenotype.cycle.data.current_phase_index  = " <<i<< std::endl;
 	
 	phenotype.cycle.data.elapsed_time_in_phase += dt; 
 
@@ -305,7 +300,6 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 		{
 			// check to see if we should transition 
 			bool continue_transition = false; 
-            std::cout << "l." <<__LINE__<< "phase_links[i][k].fixed_duration = " << phase_links[i][k].fixed_duration<< ", where i="<<i<<", k="<<k<< std::endl;
 			if( phase_links[i][k].fixed_duration )
 			{
 				if( phenotype.cycle.data.elapsed_time_in_phase > 1.0/phenotype.cycle.data.transition_rates[i][k] )

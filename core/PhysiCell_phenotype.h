@@ -375,12 +375,19 @@ class Mechanics
 	// this is a multiple of the cell (equivalent) radius
 	double relative_maximum_adhesion_distance; 
 	// double maximum_adhesion_distance; // needed? 
-	
-	double relative_maximum_attachment_distance; 
-	double relative_detachment_distance; 
-	
+
+	/* for spring attachments */ 
+
 	int maximum_number_of_attachments; 
 	double attachment_elastic_constant; 
+
+	double attachment_rate; 
+	double detachment_rate; 
+
+	/* to be deprecated */ 
+
+	double relative_maximum_attachment_distance; 
+	double relative_detachment_distance; 
 	double maximum_attachment_rate; 
 	
 	Mechanics(); // done 
@@ -467,6 +474,8 @@ class Cell_Functions
 {
  private:
  public:
+	Cell* (*instantiate_cell)(); 
+
 	Cycle_Model cycle_model; 
 
 	void (*volume_update_function)( Cell* pCell, Phenotype& phenotype , double dt ); // used in cell 
@@ -475,6 +484,9 @@ class Cell_Functions
 	void (*custom_cell_rule)( Cell* pCell, Phenotype& phenotype, double dt ); 
 	void (*update_phenotype)( Cell* pCell, Phenotype& phenotype, double dt ); // used in celll
 	
+	void (*pre_update_intracellular) ( Cell* pCell, Phenotype& phenotype, double dt );
+	void (*post_update_intracellular) ( Cell* pCell, Phenotype& phenotype, double dt );
+
 	void (*update_velocity)( Cell* pCell, Phenotype& phenotype, double dt ); 
 	
 	void (*add_cell_basement_membrane_interactions)(Cell* pCell, Phenotype& phenotype, double dt );
@@ -490,6 +502,11 @@ class Cell_Functions
 	void (*internal_substrate_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
 	void (*molecular_model_function)(Cell* pCell, Phenotype& phenotype , double dt ); 
 */
+	
+	
+	void (*plot_agent_SVG)(std::ofstream& os, Cell* pCell, double z_slice, std::vector<std::string> (*cell_coloring_function)(Cell*), double X_lower, double Y_lower);
+	void (*plot_agent_legend)(std::ofstream& os, Cell_Definition* cell_def, double& cursor_x, double& cursor_y, std::vector<std::string> (*cell_coloring_function)(Cell*), double temp_cell_radius);
+
 	
 	Cell_Functions(); // done 
 };
@@ -599,6 +616,10 @@ class Intracellular
 
 	// This function update the model for the time_step defined in the xml definition
 	virtual void update() = 0;
+	virtual void update(Cell* cell, Phenotype& phenotype, double dt) = 0;
+
+	// This function deals with inheritance from mother to daughter cells
+	virtual void inherit(Cell* cell) = 0;
 
 	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
@@ -608,6 +629,8 @@ class Intracellular
 
 	virtual std::string get_state() = 0;  
 	
+	virtual void display(std::ostream& os) = 0;
+
 	virtual Intracellular* clone() = 0;
 	
 	virtual ~Intracellular(){};
@@ -637,7 +660,13 @@ class Cell_Interactions
 	double dead_phagocytosis_rate; 
 	std::vector<double> live_phagocytosis_rates; 
 	// attack parameters (e.g., T cells)
+
 	std::vector<double> attack_rates;
+		// do I attack cell type j? 
+
+	std::vector<double> immunogenicities; // new! 
+		// how immnogenic am I to cell type j? 
+
 	double damage_rate;  
 	// cell fusion parameters 
 	std::vector<double> fusion_rates;
@@ -650,6 +679,7 @@ class Cell_Interactions
 	double& live_phagocytosis_rate( std::string type_name ); // done 
 	double& attack_rate( std::string type_name ); // done 
 	double& fusion_rate( std::string type_name ); // done 
+	double& immunogenicity( std::string type_name ); // done 
 	
 	// automated cell phagocytosis, attack, and fusion 
 //	void perform_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
@@ -671,6 +701,34 @@ class Cell_Transformations
 	
 	// automated cell transformations
 	// void perform_transformations( Cell* pCell, Phenotype& phenotype, double dt ); 
+};
+
+// pre-beta functionality in 1.10.3 
+class Integrity
+{
+ private:
+ public: 
+	// generic damage variable
+	double damage; 
+	double damage_rate; 
+	double damage_repair_rate; 
+
+	// lipid damage (e.g, cell membrane, organelles)
+	double lipid_damage; 
+	double lipid_damage_rate; 
+	double lipid_damage_repair_rate; 
+
+	// DNA damage 
+	double DNA_damage; 
+	double DNA_damage_rate; 
+	double DNA_damage_repair_rate; 
+
+	// other damages?
+	// mitochondrial? spindle? other? 
+
+	Integrity(); 
+
+	void advance_damage_models( double dt ); 
 };
 
 class Phenotype

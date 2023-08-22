@@ -89,7 +89,7 @@
 #include <iterator> 
 
 namespace PhysiCell{
-	
+
 std::unordered_map<std::string,Cell_Definition*> cell_definitions_by_name; 
 std::unordered_map<int,Cell_Definition*> cell_definitions_by_type; 
 std::vector<Cell_Definition*> cell_definitions_by_index;
@@ -100,6 +100,9 @@ std::unordered_map<int,int> cell_definition_indices_by_type;
 // function pointer on how to choose cell orientation at division
 // in case you want the legacy method 
 std::vector<double> (*cell_division_orientation)(void) = UniformOnUnitSphere; // LegacyRandomOnUnitSphere; 
+
+Cell* standard_instantiate_cell()
+{ return new Cell; }
 
 Cell_Parameters::Cell_Parameters()
 {
@@ -148,6 +151,7 @@ Cell_Definition::Cell_Definition()
 		// the default Custom_Cell_Data constructor should take care of this
 		
 	// set up the default functions 
+	functions.instantiate_cell = NULL;
 	functions.volume_update_function = NULL; // standard_volume_update_function;
 	functions.update_migration_bias = NULL; 
 	
@@ -157,6 +161,11 @@ Cell_Definition::Cell_Definition()
 	functions.update_velocity = NULL; // standard_update_cell_velocity;
 	functions.add_cell_basement_membrane_interactions = NULL; 
 	functions.calculate_distance_to_membrane = NULL; 
+
+	// bug fix July 31 2023
+	functions.plot_agent_SVG = standard_agent_SVG;
+	functions.plot_agent_legend = standard_agent_legend;
+	// bug fix July 31 2023
 	
 	functions.set_orientation = NULL;
 	
@@ -226,11 +235,14 @@ Cell_Definition cell_defaults;
 Cell_State::Cell_State()
 {
 	neighbors.resize(0); 
+	spring_attachments.resize(0); 
+
 	orientation.resize( 3 , 0.0 ); 
 	
 	simple_pressure = 0.0; 
 	
 	attached_cells.clear(); 
+	spring_attachments.clear(); 
 	
 	number_of_nuclei = 1; 
 	
@@ -304,7 +316,28 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	// New March 2022
 	// perform transformations 
 	standard_cell_transformations( this,this->phenotype,dt_ ); 
-	
+
+	// New March 2023 in Version 1.12.0 
+	// call the rules-based code to update the phenotype 
+	if( PhysiCell_settings.rules_enabled )
+	{ apply_ruleset( this ); }
+	if( get_single_signal(this,"necrotic") > 0.5 )
+	{
+		double rupture = this->phenotype.volume.rupture_volume; 
+		double volume = this->phenotype.volume.total; 
+		if( volume > rupture )
+		{
+			std::cout << this->phenotype.volume.total << " vs " << this->phenotype.volume.rupture_volume << 
+			" dead: " << get_single_signal( this, "dead") << 	std::endl; 
+			std::cout << this->phenotype.cycle.current_phase_index() << " " 
+			<< this->phenotype.cycle.pCycle_Model->name << std::endl; 
+		}
+
+	}
+
+//	if( functions.update_phenotype )
+//	{ functions.update_phenotype( this , phenotype , dt_ ); }
+
 	// call the custom code to update the phenotype 
 	if( functions.update_phenotype )
 	{ functions.update_phenotype( this , phenotype , dt_ ); }
@@ -420,6 +453,8 @@ Cell::~Cell()
 		{
 			// release any attached cells (as of 1.7.2 release)
 			this->remove_all_attached_cells(); 
+			// 1.11.0
+			this->remove_all_spring_attachments(); 
 			
 			// released internalized substrates (as of 1.5.x releases)
 			this->release_internalized_substrates(); 
@@ -509,8 +544,24 @@ Cell* Cell::divide( )
 	
 	// make sure ot remove adhesions 
 	remove_all_attached_cells(); 
+	remove_all_spring_attachments(); 
+
+	// version 1.10.3: 
+	// conserved quantitites in custom data aer divided in half
+	// so that each daughter cell gets half of the original ;
+	for( int nn = 0 ; nn < custom_data.variables.size() ; nn++ )
+	{
+		if( custom_data.variables[nn].conserved_quantity == true )
+		{ custom_data.variables[nn].value *= 0.5; }
+	}
+	for( int nn = 0 ; nn < custom_data.vector_variables.size() ; nn++ )
+	{
+		if( custom_data.vector_variables[nn].conserved_quantity == true )
+		{ custom_data.vector_variables[nn].value *= 0.5; }
+	}
+
 	
-	Cell* child = create_cell();
+	Cell* child = create_cell(functions.instantiate_cell);
 	child->copy_data( this );	
 	child->copy_function_pointers(this);
 	child->parameters = parameters;
@@ -583,9 +634,10 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 
-    if (child->phenotype.intracellular)
+    if (child->phenotype.intracellular){
         child->phenotype.intracellular->start();
-	
+		child->phenotype.intracellular->inherit(this);
+	}
 // #ifdef ADDON_PHYSIDFBA
 // 	child->fba_model = this->fba_model;
 // #endif
@@ -1005,10 +1057,16 @@ void Cell::add_potentials(Cell* other_agent)
 	return;
 }
 
-Cell* create_cell( void )
+Cell* create_cell( Cell* (*custom_instantiate)())
 {
 	Cell* pNew; 
-	pNew = new Cell;		
+	
+	if (custom_instantiate) {
+		pNew = custom_instantiate();
+	} else {
+		pNew = standard_instantiate_cell();
+	}
+	
 	(*all_cells).push_back( pNew ); 
 	pNew->index=(*all_cells).size()-1;
 	
@@ -1031,7 +1089,7 @@ Cell* create_cell( void )
 // In that "create_cell()" uses "create_cell( cell_defaults )" 
 Cell* create_cell( Cell_Definition& cd )
 {
-	Cell* pNew = create_cell(); 
+	Cell* pNew = create_cell(cd.functions.instantiate_cell); 
 	
 	// use the cell defaults; 
 	pNew->type = cd.type; 
@@ -1042,6 +1100,9 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->functions = cd.functions; 
 	
 	pNew->phenotype = cd.phenotype; 
+	if (pNew->phenotype.intracellular)
+		pNew->phenotype.intracellular->start();
+
 	pNew->is_movable = cd.is_movable; //  true;
 	pNew->is_out_of_domain = false;
 	pNew->displacement.resize(3,0.0); // state? 
@@ -1054,8 +1115,7 @@ Cell* create_cell( Cell_Definition& cd )
 }
 
 void Cell::convert_to_cell_definition( Cell_Definition& cd )
-{
-	
+{	
 	// use the cell defaults; 
 	type = cd.type; 
 	type_name = cd.name; 
@@ -1086,6 +1146,8 @@ void delete_cell( int index )
 	
 	// release any attached cells (as of 1.7.2 release)
 	pDeleteMe->remove_all_attached_cells(); 
+	// 1.11.0 
+	pDeleteMe->remove_all_spring_attachments(); 
 	
 	// released internalized substrates (as of 1.5.x releases)
 	pDeleteMe->release_internalized_substrates(); 
@@ -1115,6 +1177,8 @@ void delete_cell_original( int index ) // before June 11, 2020
 	
 	// release any attached cells (as of 1.7.2 release)
 	(*all_cells)[index]->remove_all_attached_cells(); 
+	// 1.11.0
+	(*all_cells)[index]->remove_all_spring_attachments(); 
 	
 	// released internalized substrates (as of 1.5.x releases)
 	(*all_cells)[index]->release_internalized_substrates(); 
@@ -1232,6 +1296,24 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 			<< ") of size " << pCell_to_eat->phenotype.volume.total << std::endl; }
 		*/
 
+		// mark it as dead 
+		pCell_to_eat->phenotype.death.dead = true; 
+		// set secretion and uptake to zero 
+		pCell_to_eat->phenotype.secretion.set_all_secretion_to_zero( );  
+		pCell_to_eat->phenotype.secretion.set_all_uptake_to_zero( ); 
+		
+		// deactivate all custom function 
+		pCell_to_eat->functions.custom_cell_rule = NULL; 
+		pCell_to_eat->functions.update_phenotype = NULL; 
+		pCell_to_eat->functions.contact_function = NULL; 
+		
+		// should set volume fuction to NULL too! 
+		pCell_to_eat->functions.volume_update_function = NULL; 
+
+		// set cell as unmovable and non-secreting 
+		pCell_to_eat->is_movable = false; 
+		pCell_to_eat->is_active = false; 
+
 		// absorb all the volume(s)
 
 		// absorb fluid volume (all into the cytoplasm) 
@@ -1293,31 +1375,16 @@ void Cell::ingest_cell( Cell* pCell_to_eat )
 		
 		// flag it for removal 
 		// pCell_to_eat->flag_for_removal(); 
-		// mark it as dead 
-		pCell_to_eat->phenotype.death.dead = true; 
-		// set secretion and uptake to zero 
-		pCell_to_eat->phenotype.secretion.set_all_secretion_to_zero( );  
-		pCell_to_eat->phenotype.secretion.set_all_uptake_to_zero( ); 
-		
-		// deactivate all custom function 
-		pCell_to_eat->functions.custom_cell_rule = NULL; 
-		pCell_to_eat->functions.update_phenotype = NULL; 
-		pCell_to_eat->functions.contact_function = NULL; 
-		
-		// should set volume fuction to NULL too! 
-		pCell_to_eat->functions.volume_update_function = NULL; 
 
 		// remove all adhesions 
 		// pCell_to_eat->remove_all_attached_cells();
 		
-		// set cell as unmovable and non-secreting 
-		pCell_to_eat->is_movable = false; 
-		pCell_to_eat->is_active = false; 
 	}
 
 	// things that have their own thread safety 
 	pCell_to_eat->flag_for_removal();
 	pCell_to_eat->remove_all_attached_cells();
+	pCell_to_eat->remove_all_spring_attachments();
 	
 	return; 
 }
@@ -1478,6 +1545,7 @@ void Cell::fuse_cell( Cell* pCell_to_fuse )
 	// things that have their own thread safety 
 	pCell_to_fuse->flag_for_removal();
 	pCell_to_fuse->remove_all_attached_cells();
+	pCell_to_fuse->remove_all_spring_attachments();
 
 	return; 
 }
@@ -1596,6 +1664,7 @@ void display_cell_definitions( std::ostream& os )
 {
 	for( int n=0; n < cell_definitions_by_index.size() ; n++ )
 	{
+        os << "\n------------------  rwh: ----------------\n";
 		Cell_Definition* pCD = cell_definitions_by_index[n]; 
 		os << n << " :: type:" << pCD->type << " name: " << pCD->name << std::endl; 
 
@@ -1608,6 +1677,7 @@ void display_cell_definitions( std::ostream& os )
 			// let's show the transition rates 
 			Cycle_Model* pCM = &(pCD->phenotype.cycle.model() ); 
 			Cycle_Data* pCMD = &(pCD->phenotype.cycle.data ); 
+            os << "rwh: l." << __LINE__ << "): pCMD (--cycle-- model data) address = " << pCMD << std::endl;  // argh/yipeee - same address for all!
 			for( int n=0 ; n < pCM->phases.size() ; n++ )
 			{
 				os << "\t\tPhase " << n << ": " << pCM->phases[n].name << std::endl; 
@@ -1640,6 +1710,7 @@ void display_cell_definitions( std::ostream& os )
 
 			Cycle_Model* pCM = (pCD->phenotype.death.models[k] ); 
 			Cycle_Data* pCMD = &(pCD->phenotype.death.models[k]->data ); 
+            os << "rwh: l." << __LINE__ << "): pCMD (death model data) address = " << pCMD << std::endl;  // argh/yipeee - same address for all!
 
 			
 			os << "\t\tdeath phase transitions: " << std::endl 
@@ -1706,9 +1777,27 @@ void display_cell_definitions( std::ostream& os )
 		
 		
 		// mechanics
+
+		Mechanics* pMech = &(pCD->phenotype.mechanics); 
+
+		os << "\tmechanics:" << std::endl 
+			<< "\t\tcell_cell_adhesion_strength: " << pMech->cell_cell_adhesion_strength << std::endl 
+			<< "\t\tcell_cell_repulsion_strength: " << pMech->cell_cell_repulsion_strength << std::endl 
+			<< "\t\trel max adhesion dist: " << pMech->relative_maximum_adhesion_distance << std::endl 
+			<< "\t\tcell_BM_adhesion_strength: " << pMech->cell_BM_adhesion_strength << std::endl 
+			<< "\t\tcell_BM_repulsion_strength: " << pMech->cell_BM_repulsion_strength << std::endl 
+			<< "\t\tattachment_elastic_constant: " << pMech->attachment_elastic_constant << std::endl 
+			<< "\t\tattachment_rate: " << pMech->attachment_rate << std::endl 
+			<< "\t\tdetachment_rate: " << pMech->detachment_rate << std::endl;
 		
 		// size 
 	
+
+		// intracellular
+		if (pCD->phenotype.intracellular != NULL)
+		{
+			pCD->phenotype.intracellular->display(os);
+		}
 		
 		Custom_Cell_Data* pCCD = &(pCD->custom_data); 
 		os << "\tcustom data: " << std::endl; 
@@ -2421,9 +2510,17 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if( node_mech )
 		{ pM->cell_cell_adhesion_strength = xml_get_my_double_value( node_mech ); }	
 
+		node_mech = node.child( "cell_BM_adhesion_strength" );
+		if( node_mech )
+		{ pM->cell_BM_adhesion_strength = xml_get_my_double_value( node_mech ); }	
+
 		node_mech = node.child( "cell_cell_repulsion_strength" );
 		if( node_mech )
 		{ pM->cell_cell_repulsion_strength = xml_get_my_double_value( node_mech ); }	
+
+		node_mech = node.child( "cell_BM_repulsion_strength" );
+		if( node_mech )
+		{ pM->cell_BM_repulsion_strength = xml_get_my_double_value( node_mech ); }	
 
 		node_mech = node.child( "relative_maximum_adhesion_distance" );
 		if( node_mech )
@@ -2474,6 +2571,20 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				}
 			}
 		}
+
+        node_mech = node.child( "attachment_elastic_constant" );
+		if( node_mech )
+		{ pM->attachment_elastic_constant = xml_get_my_double_value( node_mech ); }
+		std::cout << "  --------- attachment_elastic_constant = " << pM->attachment_elastic_constant << std::endl;
+
+        node_mech = node.child( "attachment_rate" );
+		if( node_mech )
+		{ pM->attachment_rate = xml_get_my_double_value( node_mech ); }	
+
+        node_mech = node.child( "detachment_rate" );
+		if( node_mech )
+		{ pM->detachment_rate = xml_get_my_double_value( node_mech ); }	
+
 	}
 	
 	// motility 
@@ -2854,13 +2965,13 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	}	
 
     	// intracellular
-	
 	node = cd_node.child( "phenotype" );
 	node = node.child( "intracellular" ); 
 	if( node )
 	{
 		std::string model_type = node.attribute( "type" ).value(); 
 		
+
 #ifdef ADDON_PHYSIBOSS
 		if (model_type == "maboss") {
 			// If it has already be copied
@@ -2909,8 +3020,12 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 #endif
 
-	}	
-	
+	} else{
+
+		pCD->phenotype.intracellular = NULL;
+
+	}
+
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
 	pugi::xml_node node1 = node.first_child(); 
@@ -2920,10 +3035,12 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		std::string name = xml_get_my_name( node1 ); 
 		
 		// units 
-		std::string units = node1.attribute( "units").value(); 
-		
+		std::string units = node1.attribute( "units").value(); 		
 		std::vector<double> values; // ( length, 0.0 ); 
-		
+
+		// conserved quantity 
+		bool conserved = node1.attribute( "conserved").as_bool(); 
+
 		// get value(s)
 		std::string str_values = xml_get_my_string_value( node1 ); 
 		csv_to_vector( str_values.c_str() , values ); 
@@ -2941,6 +3058,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// otherwise, add 
 			else
 			{ pCD->custom_data.add_variable( name, units, values[0] ); }
+
+			n = pCD->custom_data.find_variable_index( name ); 
 		}
 		// or vector 
 		else
@@ -2953,7 +3072,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// otherwise, add 
 			else
 			{ pCD->custom_data.add_vector_variable( name, units, values ); }
+
+			n = pCD->custom_data.find_vector_variable_index( name ); 
 		}
+
+		// set conserved attribute 
 		
 		node1 = node1.next_sibling(); 
 	}
@@ -2975,6 +3098,7 @@ void initialize_cell_definitions_from_pugixml( pugi::xml_node root )
 			std::cout << "virtual_wall_at_domain_edge: enabled" << std::endl; 
 			cell_defaults.functions.add_cell_basement_membrane_interactions = standard_domain_edge_avoidance_interactions;
 		}
+
 	}
 	
 	// first, let's pre-build the map. 
@@ -3033,6 +3157,23 @@ void Cell::attach_cell( Cell* pAddMe )
 	return; 
 }
 
+void Cell::attach_cell_as_spring( Cell* pAddMe )
+{
+	#pragma omp critical
+	{
+		bool already_attached = false; 
+		for( int i=0 ; i < state.spring_attachments.size() ; i++ )
+		{
+			if( state.spring_attachments[i] == pAddMe )
+			{ already_attached = true; }
+		}
+		if( already_attached == false )
+		{ state.spring_attachments.push_back( pAddMe ); }
+	}
+	// pAddMe->attach_cell( this ); 
+	return; 
+}
+
 void Cell::detach_cell( Cell* pRemoveMe )
 {
 	#pragma omp critical
@@ -3057,6 +3198,30 @@ void Cell::detach_cell( Cell* pRemoveMe )
 	return; 
 }
 
+void Cell::detach_cell_as_spring( Cell* pRemoveMe )
+{
+	#pragma omp critical
+	{
+		bool found = false; 
+		int i = 0; 
+		while( !found && i < state.spring_attachments.size() )
+		{
+			// if pRemoveMe is in the cell's list, remove it
+			if( state.spring_attachments[i] == pRemoveMe )
+			{
+				int n = state.spring_attachments.size(); 
+				// copy last entry to current position 
+				state.spring_attachments[i] = state.spring_attachments[n-1]; 
+				// shrink by one 
+				state.spring_attachments.pop_back(); 
+				found = true; 
+			}
+			i++; 
+		}
+	}
+	return; 
+}
+
 void Cell::remove_all_attached_cells( void )
 {
 	{
@@ -3071,6 +3236,21 @@ void Cell::remove_all_attached_cells( void )
 	return; 
 }
 
+void Cell::remove_all_spring_attachments( void )
+{
+	{
+		// remove self from any attached cell's list. 
+		for( int i = 0; i < state.spring_attachments.size() ; i++ )
+		{
+			state.spring_attachments[i]->detach_cell_as_spring( this ); 
+		}
+		// clear my list 
+		state.spring_attachments.clear(); 
+	}
+	return; 
+}
+
+
 void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 {
 	pCell_1->attach_cell( pCell_2 );
@@ -3078,10 +3258,24 @@ void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 	return; 
 }
 
+void attach_cells_as_spring( Cell* pCell_1, Cell* pCell_2 )
+{
+	pCell_1->attach_cell_as_spring( pCell_2 );
+	pCell_2->attach_cell_as_spring( pCell_1 );
+	return; 
+}
+
 void detach_cells( Cell* pCell_1 , Cell* pCell_2 )
 {
 	pCell_1->detach_cell( pCell_2 );
 	pCell_2->detach_cell( pCell_1 );
+	return; 
+}
+
+void detach_cells_as_spring( Cell* pCell_1 , Cell* pCell_2 )
+{
+	pCell_1->detach_cell_as_spring( pCell_2 );
+	pCell_2->detach_cell_as_spring( pCell_1 );
 	return; 
 }
 
