@@ -1065,7 +1065,8 @@ void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static int vtest_external = microenvironment.find_density_index( "VTEST" ); 
 		 
 		double virus_amount = pCell->nearest_density_vector()[vtest_external];
-		if( virus_amount*microenvironment.mesh.voxels[1].volume > parameters.doubles("virions_needed_for_DC_activation")) // (Adrianne) amount of virus in local voxel with DC is greater than 10
+		// if( virus_amount*microenvironment.mesh.voxels[1].volume > parameters.doubles("virions_needed_for_DC_activation")) // (Adrianne) amount of virus in local voxel with DC is greater than 10
+		if( virus_amount*microenvironment.mesh.voxels[1].volume > parameters.ints("virions_needed_for_DC_activation")) // (Adrianne) amount of virus in local voxel with DC is greater than 10
 		{
 			
 			pCell->custom_data["activated_immune_cell"] = 1.0; // (Adrianne) DC becomes activated
@@ -1079,7 +1080,7 @@ void DC_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 			{
 				pTestCell = neighbors[n]; 
 				// if it is not me and the target is dead 
-				if( pTestCell != pCell && pTestCell->phenotype.death.dead == false && pTestCell->custom_data["Vnuc"]>parameters.doubles("infection_detection_threshold")/Vvoxel )
+				if( pTestCell != pCell && pTestCell->phenotype.death.dead == false && pTestCell->custom_data["Vnuc"]>parameters.doubles("Infection_detection_threshold")/Vvoxel )
 				{			
 					pCell->custom_data["activated_immune_cell"] = 1.0; 
 					

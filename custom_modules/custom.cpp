@@ -128,6 +128,9 @@ void create_cell_types( void )
 	*/
 		
 	build_cell_definitions_maps(); 
+
+    setup_signal_behavior_dictionaries(); 	
+
 	display_cell_definitions( std::cout ); 
 	
 	return; 
