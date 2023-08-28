@@ -72,6 +72,9 @@ void create_cell_types( void )
 	// set the random seed 
 	SeedRandom( parameters.ints("random_seed") );  
 	
+
+    initialize_default_cell_definition(); 
+
 	/* 
 	   Put any modifications to default cell definition here if you 
 	   want to have "inherited" by other cell types. 
